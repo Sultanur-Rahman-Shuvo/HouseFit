@@ -1,0 +1,67 @@
+.leaderboard {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.leaderboard-item:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-item .rank {
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 40px;
+}
+
+.leaderboard-item .count {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--success);
+}
+
+.disclaimer {
+  margin-top: 12px;
+  padding: 8px;
+  background: #fef3c7;
+  border-radius: 4px;
+  color: #92400e;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.filters {
+  margin-bottom: 20px;
+}
+
+.filters .grid {
+  margin-bottom: 12px;
+}
