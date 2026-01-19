@@ -14,23 +14,6 @@ const problemReportSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Building',
     },
-    category: {
-        type: String,
-        enum: [
-            'electricity',
-            'water-supply',
-            'cleaning',
-            'gas',
-            'garbage',
-            'sanitary',
-            'plumbing',
-            'electrical',
-            'maintenance',
-            'security',
-            'other',
-        ],
-        required: true,
-    },
     priority: {
         type: String,
         enum: ['low', 'medium', 'high', 'urgent'],

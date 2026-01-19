@@ -9,6 +9,7 @@ const LeaveRequest = require('../models/LeaveRequest');
 const ProblemReport = require('../models/ProblemReport');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const SalaryRaise = require('../models/SalaryRaise');
 const { sendEmail } = require('../config/email');
 const {
     paymentVerifiedTemplate,
@@ -17,6 +18,25 @@ const {
     treeApprovedTemplate,
     leaveApprovedTemplate,
 } = require('../utils/emailTemplates');
+
+// Dashboard stats
+exports.getStats = async (req, res) => {
+    try {
+        const [totalUsers, totalBuildings, totalFlats, pendingBookings] = await Promise.all([
+            User.countDocuments({}),
+            Building.countDocuments({}),
+            Flat.countDocuments({}),
+            BookingRequest.countDocuments({ status: 'pending' }),
+        ]);
+
+        return res.json({
+            success: true,
+            stats: { totalUsers, totalBuildings, totalFlats, pendingBookings },
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 // Buildings
 exports.createBuilding = async (req, res) => {
@@ -49,6 +69,15 @@ exports.createFlat = async (req, res) => {
     try {
         const flat = await Flat.create(req.body);
         res.status(201).json({ success: true, data: { flat } });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.getAllFlats = async (req, res) => {
+    try {
+        const flats = await Flat.find().populate('buildingId');
+        return res.json({ success: true, data: { flats } });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -232,7 +261,7 @@ exports.deleteEmployee = async (req, res) => {
 exports.getAllTrees = async (req, res) => {
     try {
         const trees = await TreeSubmission.find()
-            .populate('userId', 'firstName lastName')
+            .populate('userId', 'firstName lastName treePoints')
             .sort({ createdAt: -1 });
 
         res.json({ success: true, data: { trees } });
@@ -484,6 +513,109 @@ exports.broadcastNotification = async (req, res) => {
         });
 
         res.json({ success: true, message: 'Notification sent' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Users management
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find().select('-password -refreshTokens');
+        return res.json({ success: true, data: { users } });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.verifyUser = async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { isVerified: true },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        res.json({ success: true, message: 'User verified', data: { user } });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.params.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        res.json({ success: true, message: 'User deleted' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Salary Raises
+exports.getAllSalaryRaises = async (req, res) => {
+    try {
+        const raises = await SalaryRaise.find()
+            .populate({
+                path: 'employeeId',
+                populate: { path: 'userId', select: 'firstName lastName email' }
+            })
+            .sort({ createdAt: -1 });
+
+        res.json({ success: true, data: { raises } });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.approveSalaryRaise = async (req, res) => {
+    try {
+        const { adminResponse } = req.body;
+        const raise = await SalaryRaise.findById(req.params.id).populate('employeeId');
+
+        if (!raise) {
+            return res.status(404).json({ success: false, message: 'Salary raise request not found' });
+        }
+
+        raise.status = 'approved';
+        raise.adminResponse = adminResponse || 'Salary raise approved';
+        raise.reviewedBy = req.user._id;
+        raise.reviewedAt = Date.now();
+        await raise.save();
+
+        // Update employee salary
+        const employee = await Employee.findById(raise.employeeId);
+        employee.salary = raise.requestedSalary;
+        await employee.save();
+
+        res.json({ success: true, message: 'Salary raise approved', data: { raise } });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.rejectSalaryRaise = async (req, res) => {
+    try {
+        const { adminResponse } = req.body;
+        const raise = await SalaryRaise.findById(req.params.id);
+
+        if (!raise) {
+            return res.status(404).json({ success: false, message: 'Salary raise request not found' });
+        }
+
+        raise.status = 'rejected';
+        raise.adminResponse = adminResponse || 'Salary raise rejected';
+        raise.reviewedBy = req.user._id;
+        raise.reviewedAt = Date.now();
+        await raise.save();
+
+        res.json({ success: true, message: 'Salary raise rejected', data: { raise } });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

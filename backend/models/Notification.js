@@ -8,6 +8,7 @@ const notificationSchema = new mongoose.Schema({
     recipientRole: {
         type: String,
         enum: ['admin', 'owner', 'tenant', 'visitor', 'employee', 'all'],
+        enum: ['admin', 'owner', 'tenant', 'employee', 'all'],
     },
     title: {
         type: String,

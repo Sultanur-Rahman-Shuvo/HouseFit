@@ -8,12 +8,20 @@ exports.register = async (req, res) => {
     try {
         const { username, email, password, role, firstName, lastName, phone } = req.body;
 
-        // Check if user exists
-        const userExists = await User.findOne({ $or: [{ email }, { username }] });
+        // Check if user exists by email, username, or phone
+        const userExists = await User.findOne({ $or: [{ email }, { username }, { phone }] });
         if (userExists) {
+            let message = 'User with this information already exists';
+            if (userExists.email === email) {
+                message = 'Email already registered';
+            } else if (userExists.username === username) {
+                message = 'Username already taken';
+            } else if (userExists.phone === phone) {
+                message = 'Phone number already registered';
+            }
             return res.status(400).json({
                 success: false,
-                message: 'User with this email or username already exists',
+                message,
             });
         }
 
@@ -22,7 +30,7 @@ exports.register = async (req, res) => {
             username,
             email,
             password,
-            role: role || 'visitor',
+            role: role || 'tenant',
             firstName,
             lastName,
             phone,

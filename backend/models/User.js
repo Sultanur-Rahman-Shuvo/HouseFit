@@ -25,8 +25,8 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['admin', 'owner', 'tenant', 'visitor', 'employee'],
-        default: 'visitor',
+        enum: ['admin', 'owner', 'tenant', 'employee'],
+        default: 'tenant',
     },
     firstName: {
         type: String,
@@ -40,7 +40,14 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
+        unique: true,
+        sparse: true,
         trim: true,
+        match: [/^01[0-9]{9}$/, 'Valid Bangladeshi phone number required (01XXXXXXXXX)'],
+    },
+    isVerified: {
+        type: Boolean,
+        default: false,
     },
     profileImage: {
         type: String,

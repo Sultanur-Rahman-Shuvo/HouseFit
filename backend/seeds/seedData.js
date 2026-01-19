@@ -7,6 +7,7 @@ const Bill = require('../models/Bill');
 const TreeSubmission = require('../models/TreeSubmission');
 const ProblemReport = require('../models/ProblemReport');
 const BookingRequest = require('../models/BookingRequest');
+const Employee = require('../models/Employee');
 
 const connectDB = async () => {
     try {
@@ -39,11 +40,11 @@ const seedData = async () => {
             email: 'admin@housefit.local',
             password: 'Admin@123',
             role: 'admin',
-            firstName: 'Admin',
-            lastName: 'User',
+            firstName: 'System',
+            lastName: 'Admin',
             phone: '01712345678',
+            isVerified: true,
         });
-
         const owner1 = await User.create({
             username: 'owner1',
             email: 'owner1@test.com',
@@ -52,6 +53,36 @@ const seedData = async () => {
             firstName: 'John',
             lastName: 'Owner',
             phone: '01723456789',
+        });
+
+        const employee2 = await User.create({
+            username: 'employee2',
+            email: 'emp2@test.com',
+            password: 'Employee@123',
+            role: 'employee',
+            firstName: 'Maria',
+            lastName: 'Electrician',
+            phone: '01778901234',
+        });
+
+        const employee3 = await User.create({
+            username: 'employee3',
+            email: 'emp3@test.com',
+            password: 'Employee@123',
+            role: 'employee',
+            firstName: 'John',
+            lastName: 'Plumber',
+            phone: '01789012345',
+        });
+
+        const employee4 = await User.create({
+            username: 'employee4',
+            email: 'emp4@test.com',
+            password: 'Employee@123',
+            role: 'employee',
+            firstName: 'Ahmed',
+            lastName: 'Security',
+            phone: '01790123456',
         });
 
         const tenant1 = await User.create({
@@ -76,15 +107,7 @@ const seedData = async () => {
             treePoints: 15,
         });
 
-        const visitor1 = await User.create({
-            username: 'visitor1',
-            email: 'visitor1@test.com',
-            password: 'Visitor@123',
-            role: 'visitor',
-            firstName: 'Charlie',
-            lastName: 'Visitor',
-            phone: '01756789012',
-        });
+        // Visitor role removed; no visitor seeding
 
         const employee1 = await User.create({
             username: 'employee1',
@@ -274,7 +297,6 @@ const seedData = async () => {
         await ProblemReport.create({
             reportedBy: tenant1._id,
             flatId: flat1._id,
-            category: 'plumbing',
             priority: 'high',
             title: 'Bathroom sink leak',
             description: 'The bathroom sink has been leaking for two days.',
@@ -284,7 +306,6 @@ const seedData = async () => {
         await ProblemReport.create({
             reportedBy: tenant2._id,
             flatId: flat3._id,
-            category: 'electrical',
             priority: 'medium',
             title: 'Bedroom light not working',
             description: 'The main bedroom light stopped working yesterday.',
@@ -293,16 +314,47 @@ const seedData = async () => {
 
         console.log('🔧 Created problem reports');
 
-        // Create booking request
-        await BookingRequest.create({
-            visitorId: visitor1._id,
-            flatId: flat2._id,
-            message: 'I am interested in viewing this flat. Please let me know availability.',
-            requestedDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-            status: 'pending',
+        // Create employee records
+        await Employee.create({
+            userId: employee1._id,
+            employeeId: 'EMP001',
+            department: 'maintenance',
+            designation: 'Senior Maintenance Officer',
+            salary: 35000,
+            status: 'active',
         });
 
-        console.log('Created booking request');
+        await Employee.create({
+            userId: employee2._id,
+            employeeId: 'EMP002',
+            department: 'electrician',
+            designation: 'Electrician',
+            salary: 30000,
+            status: 'active',
+        });
+
+        await Employee.create({
+            userId: employee3._id,
+            employeeId: 'EMP003',
+            department: 'plumber',
+            designation: 'Plumber',
+            salary: 28000,
+            status: 'active',
+        });
+
+        await Employee.create({
+            userId: employee4._id,
+            employeeId: 'EMP004',
+            department: 'security',
+            designation: 'Security Guard',
+            salary: 25000,
+            status: 'active',
+        });
+
+        console.log('👨‍💼 Created employees');
+
+        // Create booking request
+        // Booking requests removed - guests can browse without booking
 
         console.log('\n Seed data created successfully!');
         console.log('\n Test Accounts:');
@@ -311,8 +363,10 @@ const seedData = async () => {
         console.log('Owner:    owner1@test.com / Owner@123');
         console.log('Tenant 1: tenant1@test.com / Tenant@123');
         console.log('Tenant 2: tenant2@test.com / Tenant@123');
-        console.log('Visitor:  visitor1@test.com / Visitor@123');
-        console.log('Employee: emp1@test.com / Employee@123');
+        console.log('Employee 1: emp1@test.com / Employee@123');
+        console.log('Employee 2: emp2@test.com / Employee@123');
+        console.log('Employee 3: emp3@test.com / Employee@123');
+        console.log('Employee 4: emp4@test.com / Employee@123');
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
         process.exit(0);

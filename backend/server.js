@@ -19,6 +19,7 @@ const bookingRoutes = require('./routes/bookings');
 const billRoutes = require('./routes/bills');
 const notificationRoutes = require('./routes/notifications');
 const predictRoutes = require('./routes/predict');
+const employeeRoutes = require('./routes/employees');
 
 // Initialize Express app
 const app = express();
@@ -64,6 +65,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/bills', billRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/predict', predictRoutes);
+app.use('/api/employees', employeeRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -92,8 +94,11 @@ app.listen(PORT, () => {
     console.log(`API available at http://localhost:${PORT}`);
 });
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-    console.error('Unhandled Rejection:', err.message);
-    process.exit(1);
+// Gracefully log unexpected errors instead of crashing the server
+process.on('unhandledRejection', (err, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', err);
+});
+
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
 });
