@@ -46,15 +46,21 @@ apiClient.interceptors.response.use(
                     originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
                     return apiClient(originalRequest);
                 } catch (refreshError) {
-                    // Refresh failed, logout user
-                    localStorage.clear();
-                    window.location.href = '/login';
+                    const refreshStatus = refreshError.response?.status;
+
+                    // Only force logout when refresh token is invalid/expired (auth errors)
+                    if (refreshStatus === 401 || refreshStatus === 403) {
+                        localStorage.removeItem('accessToken');
+                        localStorage.removeItem('refreshToken');
+                        window.location.href = '/login';
+                    }
+
+                    // For network/server errors, keep the user logged in and surface the error
                     return Promise.reject(refreshError);
                 }
             } else {
-                // No refresh token, logout
-                localStorage.clear();
-                window.location.href = '/login';
+                // No refresh token, do not hard logout; just reject so caller can handle
+                return Promise.reject(error);
             }
         }
 
