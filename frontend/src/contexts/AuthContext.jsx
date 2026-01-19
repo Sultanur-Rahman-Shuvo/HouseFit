@@ -20,7 +20,8 @@ export const AuthProvider = ({ children }) => {
                 setUser(data.data.user);
             } catch (error) {
                 console.error('Auth check failed:', error);
-                localStorage.clear();
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
             }
         }
 
@@ -47,11 +48,7 @@ export const AuthProvider = ({ children }) => {
     const register = async (userData) => {
         try {
             const { data } = await apiClient.post('/auth/register', userData);
-
-            localStorage.setItem('accessToken', data.data.accessToken);
-            localStorage.setItem('refreshToken', data.data.refreshToken);
-
-            setUser(data.data.user);
+            // Don't auto-login on registration; let user navigate to login page
             return { success: true };
         } catch (error) {
             return {
@@ -68,7 +65,8 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
-            localStorage.clear();
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
             setUser(null);
             window.location.href = '/login';
         }

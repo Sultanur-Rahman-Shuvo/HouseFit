@@ -13,8 +13,10 @@ import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import OwnerDashboard from './pages/OwnerDashboard';
 import VisitorDashboard from './pages/VisitorDashboard';
+import EmployeeDashboard from './pages/EmployeeDashboard';
 import FlatDetails from './pages/FlatDetails';
 import TreeVerification from './pages/TreeVerification';
+import AdminTreeSubmissions from './pages/AdminTreeSubmissions';
 import Billing from './pages/Billing';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications';
@@ -92,13 +94,23 @@ function App() {
                     </RoleRoute>
                 } />
 
+                <Route path="/admin/tree-submissions" element={
+                    <RoleRoute allowedRoles={['admin']}>
+                        <AdminTreeSubmissions />
+                    </RoleRoute>
+                } />
+
                 <Route path="/owner" element={
                     <RoleRoute allowedRoles={['owner']}>
                         <OwnerDashboard />
                     </RoleRoute>
                 } />
 
-                {/* Visitor routes (now public) */}
+                <Route path="/employee" element={
+                    <RoleRoute allowedRoles={['employee']}>
+                        <EmployeeDashboard />
+                    </RoleRoute>
+                } />
 
                 <Route path="/tree" element={
                     <RoleRoute allowedRoles={['tenant']}>

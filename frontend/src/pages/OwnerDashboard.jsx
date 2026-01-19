@@ -50,190 +50,196 @@ export default function OwnerDashboard() {
         }
     };
 
-    if (loading) return <main className="container"><p>Loading...</p></main>;
+    if (loading) return <main className="container page"><div className="loading">Loading...</div></main>;
+
+    const occupiedCount = flats.filter(f => f.status === 'occupied').length;
+    const availableCount = flats.filter(f => f.status === 'available').length;
+    const totalRent = flats.reduce((sum, f) => sum + (f.rent || 0), 0);
 
     return (
-        <main className="container" style={{ paddingTop: '20px' }}>
-            <div style={{
-                background: 'white',
-                padding: '32px',
-                borderRadius: '16px',
-                marginBottom: '24px',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-            }}>
-                <h1 style={{
-                    fontSize: '32px',
-                    fontWeight: '700',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
-                }}>My Properties</h1>
-                <p style={{ color: '#6b7280', fontSize: '16px' }}>Owner Dashboard</p>
+        <main className="container page">
+            <div className="page-header">
+                <h1 className="page-title">Owner Dashboard</h1>
+                <p className="page-subtitle">Manage your properties, tenants, and fares with the same look as admin</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="stat-card">
+                    <h3>{flats.length}</h3>
+                    <p>Total Flats</p>
+                </div>
+                <div className="stat-card bg-gradient-to-br from-emerald-600 to-green-600">
+                    <h3>{occupiedCount}</h3>
+                    <p>Occupied</p>
+                </div>
+                <div className="stat-card bg-gradient-to-br from-amber-500 to-orange-600">
+                    <h3>{availableCount}</h3>
+                    <p>Available</p>
+                </div>
+                <div className="stat-card bg-gradient-to-br from-indigo-600 to-purple-600">
+                    <h3>৳{totalRent}</h3>
+                    <p>Total Monthly Rent</p>
+                </div>
             </div>
 
             {error && <div className="alert alert-error">{error}</div>}
 
-            <div className="grid" style={{ gridTemplateColumns: '1fr 2fr' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Flats List */}
-                <div className="card">
-                    <h3>My Flats</h3>
-                    {flats.length === 0 ? (
-                        <p>No flats registered</p>
-                    ) : (
+                <div className="card border border-gray-200 dark:border-gray-700 shadow-lg">
+                    <div className="flex items-center justify-between mb-4">
                         <div>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">My Flats</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Select a flat to manage details</p>
+                        </div>
+                        <span className="badge badge-info">{flats.length}</span>
+                    </div>
+
+                    {flats.length === 0 ? (
+                        <p className="text-gray-600 dark:text-gray-300">No flats registered</p>
+                    ) : (
+                        <div className="space-y-3">
                             {flats.map((flat) => (
-                                <div
+                                <button
                                     key={flat._id}
-                                    className="card"
                                     onClick={() => handleSelectFlat(flat)}
-                                    style={{
-                                        cursor: 'pointer',
-                                        marginBottom: '10px',
-                                        padding: '10px',
-                                        border: selectedFlat?._id === flat._id ? '2px solid #007bff' : '1px solid #ddd',
-                                        backgroundColor: selectedFlat?._id === flat._id ? '#f0f8ff' : 'white',
-                                    }}
+                                    className={`w-full text-left rounded-xl border transition-all duration-200 p-4 hover:-translate-y-0.5 hover:shadow-md ${selectedFlat?._id === flat._id
+                                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+                                        }`}
                                 >
-                                    <h4>Flat {flat.flatNumber}</h4>
-                                    <p>{flat.buildingId?.name}</p>
-                                    <p><strong>Rent:</strong> ৳{flat.rent}/month</p>
-                                    <p><strong>Status:</strong> {flat.status}</p>
-                                    <p>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h4 className="text-base font-semibold text-gray-900 dark:text-white">Flat {flat.flatNumber}</h4>
+                                            <p className="text-sm text-gray-600 dark:text-gray-300">{flat.buildingId?.name}</p>
+                                        </div>
                                         {flat.currentTenant ? (
                                             <span className="badge badge-success">Occupied</span>
                                         ) : (
                                             <span className="badge badge-warning">Vacant</span>
                                         )}
-                                    </p>
-                                </div>
+                                    </div>
+                                    <div className="mt-3 flex items-center justify-between text-sm text-gray-700 dark:text-gray-300">
+                                        <span>Rent: ৳{flat.rent}/month</span>
+                                        <span className="font-semibold capitalize">{flat.status}</span>
+                                    </div>
+                                </button>
                             ))}
                         </div>
                     )}
                 </div>
 
                 {/* Flat Details & Fare Management */}
-                {selectedFlat ? (
-                    <div className="card">
-                        <h3>Flat {selectedFlat.flatNumber} - Details & Fare</h3>
-
-                        <div className="grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                            {/* Details */}
-                            <div>
-                                <h4 style={{ fontWeight: '700', marginBottom: '12px' }}>Flat Details</h4>
-                                <p><strong>Type:</strong> {selectedFlat.flatType === 'bachelor' ? 'Bachelor' : 'Family'}</p>
-                                <p><strong>Bedrooms:</strong> {selectedFlat.bedrooms}</p>
-                                <p><strong>Bathrooms:</strong> {selectedFlat.bathrooms}</p>
-                                <p><strong>Area:</strong> {selectedFlat.area} sq ft</p>
-                                <p><strong>Floor:</strong> {selectedFlat.floor}</p>
-                                <p><strong>Orientation:</strong> {selectedFlat.orientation}</p>
-                                <p><strong>Balconies:</strong> {selectedFlat.balconies}</p>
-                                <p><strong>Kitchens:</strong> {selectedFlat.kitchens}</p>
-                                <p><strong>Status:</strong> {selectedFlat.status}</p>
-                            </div>
-
-                            {/* Tenant Info */}
-                            <div>
-                                <h4 style={{ fontWeight: '700', marginBottom: '12px' }}>Current Tenant</h4>
-                                {selectedFlat.currentTenant ? (
-                                    <>
-                                        <p><strong>Name:</strong> {selectedFlat.currentTenant?.firstName} {selectedFlat.currentTenant?.lastName}</p>
-                                        <p><strong>Email:</strong> {selectedFlat.currentTenant?.email}</p>
-                                        <p><strong>Phone:</strong> {selectedFlat.currentTenant?.phone || 'N/A'}</p>
-                                        <div className="alert alert-success" style={{ marginTop: '15px' }}>
-                                            Flat is occupied
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="alert alert-warning">
-                                        No tenant currently assigned
+                <div className="lg:col-span-2 space-y-6">
+                    {selectedFlat ? (
+                        <>
+                            <div className="card border border-gray-200 dark:border-gray-700 shadow-lg">
+                                <div className="flex items-start justify-between gap-4 mb-4">
+                                    <div>
+                                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Flat {selectedFlat.flatNumber}</h3>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300">{selectedFlat.buildingId?.name}</p>
                                     </div>
-                                )}
+                                    <div className="flex items-center gap-2">
+                                        <span className="badge badge-info capitalize">{selectedFlat.flatType === 'bachelor' ? 'Bachelor' : 'Family'}</span>
+                                        {selectedFlat.currentTenant ? (
+                                            <span className="badge badge-success">Occupied</span>
+                                        ) : (
+                                            <span className="badge badge-warning">Vacant</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
+                                    <div className="space-y-1">
+                                        <p><strong>Bedrooms:</strong> {selectedFlat.bedrooms}</p>
+                                        <p><strong>Bathrooms:</strong> {selectedFlat.bathrooms}</p>
+                                        <p><strong>Area:</strong> {selectedFlat.area} sq ft</p>
+                                        <p><strong>Floor:</strong> {selectedFlat.floor}</p>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p><strong>Orientation:</strong> {selectedFlat.orientation}</p>
+                                        <p><strong>Balconies:</strong> {selectedFlat.balconies}</p>
+                                        <p><strong>Kitchens:</strong> {selectedFlat.kitchens}</p>
+                                        <p><strong>Status:</strong> <span className="capitalize">{selectedFlat.status}</span></p>
+                                    </div>
+                                </div>
+
+                                {/* Tenant Info */}
+                                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Current Tenant</h4>
+                                    {selectedFlat.currentTenant ? (
+                                        <div className="grid sm:grid-cols-3 gap-4 text-sm text-gray-700 dark:text-gray-300">
+                                            <p><strong>Name:</strong> {selectedFlat.currentTenant?.firstName} {selectedFlat.currentTenant?.lastName}</p>
+                                            <p><strong>Email:</strong> {selectedFlat.currentTenant?.email}</p>
+                                            <p><strong>Phone:</strong> {selectedFlat.currentTenant?.phone || 'N/A'}</p>
+                                        </div>
+                                    ) : (
+                                        <div className="alert alert-warning">No tenant currently assigned</div>
+                                    )}
+                                </div>
                             </div>
+
+                            <div className="card border border-gray-200 dark:border-gray-700 shadow-lg">
+                                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Update Fare & Fees</h4>
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Monthly Rent (৳)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            value={fareForm.rent}
+                                            onChange={(e) => setFareForm({ ...fareForm, rent: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Maintenance Fee (৳)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            value={fareForm.maintenance}
+                                            onChange={(e) => setFareForm({ ...fareForm, maintenance: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cleaning Fee (৳)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            value={fareForm.cleaning}
+                                            onChange={(e) => setFareForm({ ...fareForm, cleaning: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Garbage Fee (৳)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            value={fareForm.garbage}
+                                            onChange={(e) => setFareForm({ ...fareForm, garbage: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <button className="btn btn-primary w-full mt-5" onClick={handleUpdateFare}>
+                                    Update Fare Structure
+                                </button>
+                            </div>
+
+                            {selectedFlat.amenities?.length > 0 && (
+                                <div className="card border border-gray-200 dark:border-gray-700 shadow-lg">
+                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Amenities</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedFlat.amenities.map((amenity, i) => (
+                                            <span key={i} className="badge badge-info">{amenity}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className="card border border-dashed border-gray-300 dark:border-gray-700 h-full flex items-center justify-center text-gray-600 dark:text-gray-300">
+                            <p>Select a flat to view details and manage fare</p>
                         </div>
-
-                        {/* Fare Management */}
-                        <div style={{ marginTop: '20px', borderTop: '1px solid #ddd', paddingTop: '20px' }}>
-                            <h4 style={{ fontWeight: '700', marginBottom: '12px' }}>Update Fare & Fees</h4>
-                            <div className="grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                                <div>
-                                    <label>Monthly Rent (৳)</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        value={fareForm.rent}
-                                        onChange={(e) => setFareForm({ ...fareForm, rent: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Maintenance Fee (৳)</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        value={fareForm.maintenance}
-                                        onChange={(e) => setFareForm({ ...fareForm, maintenance: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Cleaning Fee (৳)</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        value={fareForm.cleaning}
-                                        onChange={(e) => setFareForm({ ...fareForm, cleaning: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Garbage Fee (৳)</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        value={fareForm.garbage}
-                                        onChange={(e) => setFareForm({ ...fareForm, garbage: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <button className="btn btn-primary" onClick={handleUpdateFare} style={{ marginTop: '15px', width: '100%' }}>
-                                Update Fare Structure
-                            </button>
-                        </div>
-
-                        {/* Amenities */}
-                        {selectedFlat.amenities?.length > 0 && (
-                            <div style={{ marginTop: '20px', borderTop: '1px solid #ddd', paddingTop: '20px' }}>
-                                <h4 style={{ fontWeight: '700', marginBottom: '12px' }}>Amenities</h4>
-                                <ul>
-                                    {selectedFlat.amenities.map((amenity, i) => <li key={i}>{amenity}</li>)}
-                                </ul>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <div className="card">
-                        <p className="text-muted">Select a flat to view details and manage fare</p>
-                    </div>
-                )}
-            </div>
-
-            <div className="card" style={{ marginTop: '20px' }}>
-                <h3 style={{ fontWeight: '700', marginBottom: '16px' }}>Quick Stats</h3>
-                <div className="grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
-                    <div className="stat-card">
-                        <h3>{flats.length}</h3>
-                        <p>Total Flats</p>
-                    </div>
-                    <div className="stat-card" style={{ background: 'linear-gradient(135deg, #059669 0%, #047857 100%)' }}>
-                        <h3>{flats.filter(f => f.status === 'occupied').length}</h3>
-                        <p>Occupied</p>
-                    </div>
-                    <div className="stat-card" style={{ background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)' }}>
-                        <h3>{flats.filter(f => f.status === 'available').length}</h3>
-                        <p>Available</p>
-                    </div>
-                    <div className="stat-card" style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)' }}>
-                        <h3>৳{flats.reduce((sum, f) => sum + (f.rent || 0), 0)}</h3>
-                        <p>Total Monthly Rent</p>
-                    </div>
+                    )}
                 </div>
             </div>
         </main>
