@@ -1,7 +1,7 @@
 // Email HTML templates
 
 const paymentVerifiedTemplate = ({ userName, billMonth, amount, transactionId }) => {
-    return `
+  return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -40,7 +40,7 @@ const paymentVerifiedTemplate = ({ userName, billMonth, amount, transactionId })
 };
 
 const paymentRejectedTemplate = ({ userName, transactionId, reason }) => {
-    return `
+  return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -74,7 +74,7 @@ const paymentRejectedTemplate = ({ userName, transactionId, reason }) => {
 };
 
 const bookingApprovedTemplate = ({ userName, flatNumber, requestedDate }) => {
-    return `
+  return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -108,7 +108,7 @@ const bookingApprovedTemplate = ({ userName, flatNumber, requestedDate }) => {
 };
 
 const treeApprovedTemplate = ({ userName, points, location }) => {
-    return `
+  return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -144,7 +144,7 @@ const treeApprovedTemplate = ({ userName, points, location }) => {
 };
 
 const leaveApprovedTemplate = ({ userName, startDate, endDate }) => {
-    return `
+  return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -178,7 +178,7 @@ const leaveApprovedTemplate = ({ userName, startDate, endDate }) => {
 };
 
 const billGeneratedTemplate = ({ userName, month, total, dueDate }) => {
-    return `
+  return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -213,8 +213,8 @@ const billGeneratedTemplate = ({ userName, month, total, dueDate }) => {
   `;
 };
 
-const problemAssignedTemplate = ({ employeeName, title, priority, category }) => {
-    return `
+const problemAssignedTemplate = ({ employeeName, title, priority }) => {
+  return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -240,7 +240,6 @@ const problemAssignedTemplate = ({ employeeName, title, priority, category }) =>
           <p>Dear ${employeeName},</p>
           <p>A new problem has been assigned to you.</p>
           <p><strong>Title:</strong> ${title}</p>
-          <p><strong>Category:</strong> ${category}</p>
           <p><strong>Priority:</strong> <span class="priority ${priority}">${priority.toUpperCase()}</span></p>
           <p>Please address this issue at your earliest convenience.</p>
         </div>
@@ -254,12 +253,11 @@ const problemAssignedTemplate = ({ employeeName, title, priority, category }) =>
 };
 
 module.exports = {
-    paymentVerifiedTemplate,
-    paymentRejectedTemplate,
-    bookingApprovedTemplate,
-    treeApprovedTemplate,
-    leaveApprovedTemplate,
-    billGeneratedTemplate,
-    problemAssignedTemplate,
+  paymentVerifiedTemplate,
+  paymentRejectedTemplate,
+  bookingApprovedTemplate,
+  treeApprovedTemplate,
+  leaveApprovedTemplate,
+  billGeneratedTemplate,
+  problemAssignedTemplate,
 };
-

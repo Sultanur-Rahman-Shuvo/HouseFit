@@ -21,9 +21,14 @@ const validateRegistration = [
         .trim()
         .notEmpty()
         .withMessage('Last name is required'),
+    body('phone')
+        .optional({ nullable: true })
+        .matches(/^01[0-9]{9}$/)
+        .withMessage('Valid Bangladeshi phone number required (01XXXXXXXXX)'),
     body('role')
         .optional()
         .isIn(['admin', 'owner', 'tenant', 'visitor', 'employee'])
+        .isIn(['admin', 'owner', 'tenant', 'employee'])
         .withMessage('Invalid role'),
 ];
 
@@ -123,21 +128,6 @@ const validateProblemReport = [
         .trim()
         .notEmpty()
         .withMessage('Description is required'),
-    body('category')
-        .isIn([
-            'electricity',
-            'water-supply',
-            'cleaning',
-            'gas',
-            'garbage',
-            'sanitary',
-            'plumbing',
-            'electrical',
-            'maintenance',
-            'security',
-            'other',
-        ])
-        .withMessage('Invalid category'),
     body('priority')
         .optional()
         .isIn(['low', 'medium', 'high', 'urgent'])
@@ -197,4 +187,3 @@ module.exports = {
     validateBookingRequest,
     validateObjectId,
 };
-

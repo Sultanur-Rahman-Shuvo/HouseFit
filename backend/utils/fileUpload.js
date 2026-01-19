@@ -61,28 +61,3 @@ const upload = multer({
 });
 
 module.exports = upload;
-
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-fileUpload.js [unix] (14:51 12/01/2026)                                  0,1 All
--- INSERT --
-
