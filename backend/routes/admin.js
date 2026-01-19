@@ -7,12 +7,21 @@ const roleGuard = require('../middleware/roleGuard');
 // All routes require admin role
 router.use(auth, roleGuard(['admin']));
 
+// Stats
+router.get('/stats', adminController.getStats);
+
+// Users
+router.get('/users', adminController.getAllUsers);
+router.put('/users/:id/verify', adminController.verifyUser);
+router.delete('/users/:id', adminController.deleteUser);
+
 // Buildings
 router.post('/buildings', adminController.createBuilding);
 router.get('/buildings', adminController.getAllBuildings);
 
 // Flats
 router.post('/flats', adminController.createFlat);
+router.get('/flats', adminController.getAllFlats);
 router.put('/flats/:id', adminController.updateFlat);
 router.delete('/flats/:id', adminController.deleteFlat);
 
@@ -47,5 +56,10 @@ router.post('/problems/:id/assign', adminController.assignProblem);
 
 // Notifications
 router.post('/notifications/broadcast', adminController.broadcastNotification);
+
+// Salary Raises
+router.get('/salary-raises', adminController.getAllSalaryRaises);
+router.post('/salary-raises/:id/approve', adminController.approveSalaryRaise);
+router.post('/salary-raises/:id/reject', adminController.rejectSalaryRaise);
 
 module.exports = router;
